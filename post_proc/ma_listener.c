@@ -27,6 +27,11 @@
 #include <hardware/audio_effect.h>
 #include <audio-base.h>
 
+#define HAL_LIB_NAME XSTR(LIB_AUDIO_HAL)
+
+#define XSTR(x) STR(x)
+#define STR(x) #x
+
 #define MA_FLAG ( EFFECT_FLAG_TYPE_INSERT | \
                    EFFECT_FLAG_VOLUME_MONITOR | \
                    EFFECT_FLAG_DEVICE_IND | \
