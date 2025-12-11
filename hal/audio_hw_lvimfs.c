@@ -58,7 +58,7 @@ void lvimfs_init(void) {
     if (!lvimfs_wrapper_ops->lib_handle) {
         lvimfs_wrapper_ops->lib_handle = dlopen(VENDOR_LIB_PATH, RTLD_NOW);
         if (!lvimfs_wrapper_ops->lib_handle) {
-            ALOGE("dlopen failed for %s", lvimfs_WRAPPER_LIB_NAME, dlerror());
+            ALOGE("dlopen failed for %s: %s", lvimfs_WRAPPER_LIB_NAME, dlerror());
             lvimfs_deinit();
             return;
         }
