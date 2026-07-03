@@ -94,6 +94,13 @@ target_board_platform_cc_library_shared {
         "true": ["-DSOUND_TRIGGER_ENABLED"],
         default: [],
     }) + select(soong_config_variable("ANDROID", "target_board_platform"), {
+        // msm8994 (Snapdragon 810): without -DPLATFORM_MSM8994 the msm8974
+        // platform code compiles out the v2_cvd ACDB init paths and crashes.
+        "msm8994": [
+            "-DPLATFORM_MSM8994",
+            "-DMAX_TARGET_SPECIFIC_CHANNEL_CNT=4",
+            "-DKPI_OPTIMIZE_ENABLED",
+        ],
         "msm8996": [
             "-DPLATFORM_MSM8996",
             "-DMAX_TARGET_SPECIFIC_CHANNEL_CNT=4",
