@@ -93,6 +93,15 @@ void *hw_info_init(const char *snd_card_name)
     struct hardware_info *hw_info = NULL;
     bool hw_supported = false;
 
+    /* Bail out if snd_card_name is NULL; otherwise strstr() below
+     * dereferences it and SIGSEGVs. */
+    if (!snd_card_name) {
+        ALOGE("%s: snd_card_name is NULL (kernel ALSA mixer name not "
+              "available), returning NULL hw_info; HAL will use defaults",
+              __func__);
+        return NULL;
+    }
+
     if (strstr(snd_card_name, "msm8996")) {
         ALOGD("8996 - variant soundcard");
         hw_supported = true;

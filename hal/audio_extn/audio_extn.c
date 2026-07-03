@@ -46,14 +46,22 @@ void audio_extn_set_snd_card_split(const char* in_snd_card_name)
        <target name>-<sound card name>-<form factor>-snd-card
        parse target name, sound card name and form factor
     */
-    char *snd_card_name = strdup(in_snd_card_name);
+    char *snd_card_name = NULL;
     char *tmp = NULL;
     char *device = NULL;
     char *snd_card = NULL;
     char *form_factor = NULL;
 
+    /* NULL-check before strdup: this device's ALSA card can report a
+     * NULL name, and strdup(NULL) dereferences it. */
     if (in_snd_card_name == NULL) {
         ALOGE("%s: snd_card_name passed is NULL", __func__);
+        goto on_error;
+    }
+
+    snd_card_name = strdup(in_snd_card_name);
+    if (snd_card_name == NULL) {
+        ALOGE("%s: strdup failed", __func__);
         goto on_error;
     }
 

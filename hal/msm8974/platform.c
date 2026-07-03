@@ -1601,7 +1601,9 @@ platform_backend_config_init(struct platform_data *pdata)
     pdata->current_backend_cfg[USB_AUDIO_TX_BACKEND].channels_mixer_ctl =
             strdup("USB_AUDIO_TX Channels");
 
-    if (strstr(pdata->snd_card_name, "intcodec")) {
+    /* pdata->snd_card_name can be NULL (Sony XML omits the key);
+     * guard strstr and default to the external-codec branch (WCD9335). */
+    if (pdata->snd_card_name && strstr(pdata->snd_card_name, "intcodec")) {
         pdata->current_backend_cfg[HEADPHONE_BACKEND].bitwidth_mixer_ctl =
                 strdup("INT0_MI2S_RX Format");
         pdata->current_backend_cfg[HEADPHONE_BACKEND].samplerate_mixer_ctl =
@@ -1743,6 +1745,13 @@ void *platform_init(struct audio_device *adev)
 
     adev->mixer = mixer_open(snd_card_num);
     snd_card_name = mixer_get_name(adev->mixer);
+    /* This device's ALSA card can report a NULL name; substitute a
+     * default so the many downstream snd_card_name derefs don't SIGSEGV. */
+    if (!snd_card_name) {
+        ALOGE("%s: mixer_get_name returned NULL, substituting default "
+              "msm8994-tomtom-snd-card", __func__);
+        snd_card_name = "msm8994-tomtom-snd-card";
+    }
     my_data->hw_info = hw_info_init(snd_card_name);
 
     audio_extn_set_snd_card_split(snd_card_name);
