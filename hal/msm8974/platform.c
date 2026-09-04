@@ -386,6 +386,7 @@ static const char * const device_table[SND_DEVICE_MAX] = {
     [SND_DEVICE_IN_SPEAKER_QMIC_NS] = "quad-mic",
     [SND_DEVICE_IN_SPEAKER_QMIC_AEC_NS] = "quad-mic",
     [SND_DEVICE_IN_VOICE_HEARING_AID] = "hearing-aid-mic",
+    [SND_DEVICE_IN_CAPTURE_FM] = "capture-fm",
 };
 
 static struct audio_effect_config \
@@ -1357,6 +1358,7 @@ static void set_platform_defaults(struct platform_data * my_data)
     backend_tag_table[SND_DEVICE_IN_BT_SCO_MIC_WB_NREC] = strdup("bt-sco-wb");
     backend_tag_table[SND_DEVICE_OUT_VOICE_TX] = strdup("afe-proxy");
     backend_tag_table[SND_DEVICE_IN_VOICE_RX] = strdup("afe-proxy");
+    backend_tag_table[SND_DEVICE_IN_CAPTURE_FM] = strdup("capture-fm");
 
     backend_tag_table[SND_DEVICE_OUT_USB_HEADSET] = strdup("usb-headset");
     backend_tag_table[SND_DEVICE_OUT_VOICE_USB_HEADSET] = strdup("usb-headset");
@@ -1501,6 +1503,7 @@ static void set_platform_defaults(struct platform_data * my_data)
     hw_interface_table[SND_DEVICE_IN_CAMCORDER_SELFIE_INVERT_LANDSCAPE] = strdup("SLIMBUS_0_TX");
     hw_interface_table[SND_DEVICE_IN_CAMCORDER_SELFIE_PORTRAIT] = strdup("SLIMBUS_0_TX");
     hw_interface_table[SND_DEVICE_IN_VOICE_HEARING_AID] = strdup("SLIMBUS_0_TX");
+    hw_interface_table[SND_DEVICE_IN_CAPTURE_FM] = strdup("PRI_MI2S_TX");
 
     my_data->max_mic_count = PLATFORM_DEFAULT_MIC_COUNT;
 }
@@ -3253,6 +3256,11 @@ snd_device_t platform_get_input_snd_device(void *platform,
 
     ALOGV("%s: enter: out_device(%#x) in_device(%#x) channel_count (%d) channel_mask (0x%x)",
           __func__, out_device, in_device, channel_count, channel_mask);
+
+    if (in_device & (AUDIO_DEVICE_IN_FM_TUNER & ~AUDIO_DEVICE_BIT_IN)) {
+        snd_device = SND_DEVICE_IN_CAPTURE_FM;
+        goto exit;
+    }
 
     if ((out_device != AUDIO_DEVICE_NONE) && (voice_is_in_call(adev) ||
         audio_extn_hfp_is_active(adev))) {
